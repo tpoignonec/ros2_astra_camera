@@ -12,41 +12,42 @@ if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif ()
 
-# find dependencies
-find_package(ament_cmake REQUIRED)
+# Build dependencies
 find_package(ament_cmake REQUIRED)
 find_package(ament_index_cpp REQUIRED)
-find_package(astra_camera_msgs REQUIRED)
-find_package(builtin_interfaces REQUIRED)
-find_package(camera_info_manager REQUIRED)
-find_package(class_loader REQUIRED)
-find_package(cv_bridge REQUIRED)
-find_package(message_filters REQUIRED)
-find_package(camera_info_manager REQUIRED)
-find_package(Eigen3 REQUIRED)
-find_package(image_geometry REQUIRED)
-find_package(image_publisher REQUIRED)
-find_package(image_transport REQUIRED)
-find_package(OpenCV REQUIRED)
-find_package(rclcpp REQUIRED)
-find_package(rclcpp_components REQUIRED)
-find_package(rcutils REQUIRED)
-find_package(sensor_msgs REQUIRED)
-find_package(std_msgs REQUIRED)
-find_package(std_srvs REQUIRED)
-find_package(tf2 REQUIRED)
-find_package(tf2_eigen REQUIRED)
-find_package(tf2_msgs REQUIRED)
-find_package(tf2_ros REQUIRED)
-find_package(tf2_sensor_msgs REQUIRED)
 find_package(PkgConfig REQUIRED)
 
+# Package dependencies
+set(dependencies
+  astra_camera_msgs
+  cv_bridge
+  Eigen3
+  image_geometry
+  image_transport
+  rclcpp
+  rclcpp_components
+  sensor_msgs
+  std_msgs
+  std_srvs
+  tf2
+  tf2_eigen
+  tf2_ros
+  tf2_sensor_msgs
+  message_filters
+  camera_info_manager
+)
+
+foreach(dep ${dependencies})
+  find_package(${dep} REQUIRED)
+endforeach()
+
+# Check for system libraries
 pkg_search_module(LIBUVC REQUIRED libuvc)
 if (NOT LIBUVC_FOUND)
   message(FATAL_ERROR "libuvc is not found")
 endif ()
-pkg_search_module(GLOG REQUIRED libglog)
 
+pkg_search_module(GLOG REQUIRED libglog)
 if (NOT GLOG_FOUND)
   message(FATAL_ERROR "glog is not found")
 endif ()
@@ -70,30 +71,6 @@ endif ()
 message(STATUS "ORRBEC : ${HOST_PLATFORM}")
 set(ORBBEC_OPENNI2_REDIST
   "${CMAKE_CURRENT_SOURCE_DIR}/openni2_redist/${HOST_PLATFORM}")
-
-set(dependencies
-  ament_index_cpp
-  astra_camera_msgs
-  builtin_interfaces
-  class_loader
-  cv_bridge
-  Eigen3
-  image_geometry
-  image_publisher
-  image_transport
-  rclcpp
-  rclcpp_components
-  rcutils
-  sensor_msgs
-  std_msgs
-  std_srvs
-  tf2
-  tf2_msgs
-  tf2_ros
-  tf2_sensor_msgs
-  message_filters
-  camera_info_manager
-  )
 
 add_library(${PROJECT_NAME} SHARED
   src/point_cloud_proc/point_cloud_xyz.cpp
