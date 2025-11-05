@@ -2,149 +2,128 @@
 
 A ROS2 driver for Orbbec 3D cameras
 
-## Install dependencies
+Current developments are based on the **jazzy** ROS2 distribution (Ubuntu 24.04 LTS).
 
-### ROS2
+> [!note] This is a fork of [orbbec/ros2_astra_camera](https://github.com/orbbec/ros2_astra_camera).
+> Copyright 2023 Orbbec Ltd.
 
-● Please refer to the
-official [ROS 2 installation guide](https://docs.ros.org/en/galactic/Installation/Ubuntu-Install-Debians.html)
+## Installation
 
-### other dependencies
-
-● Install dependencies (be careful with your ROS distribution)
+1. Install the ROS2 packages
 
 ```bash
- Assuming you have sourced the ros environment, same below
-sudo apt install libgflags-dev  ros-$ROS_DISTRO-image-geometry ros-$ROS_DISTRO-camera-info-manager\
-ros-$ROS_DISTRO-image-transport ros-$ROS_DISTRO-image-publisher libgoogle-glog-dev libusb-1.0-0-dev libeigen3-dev
+source /opt/ros/jazzy/setup.bash
 
+mkdir ~/ros2_ws/src
+cd ~/ros2_ws/src
+git clone https://github.com/tpoignonec/ros2_astra_camera.git
+cd ..
+
+# Install ROS2 dependencies
+rosdep install --ignore-src --from-paths . -y -r
+
+# Build packages
+colcon build
 ```
 
-● Install libuvc
+2. Setup Udev rules
 
 ```bash
-git clone https://github.com/libuvc/libuvc.git
-cd libuvc
-mkdir build && cd build
-cmake .. && make -j4
-sudo make install
-sudo ldconfig # Refreshing the link library
-```
-
-### Getting Started
-
-#### Use cases
-
-● Create a new ros2 workspace
-
-```bash
-mkdir -p ~/ros2_ws/src
-```
-
-● Extract and copy openNISDk_ROS2_xxx.tar.gz to ~/ros2_ws/src/
-● Install libusb rules
-
-```bash
-cd ~/ros2_ws/src/ros2_astra_camera/astra_camera/scripts
-sudo bash install.sh
+sudo bash src/ros2_astra_camera/astra_camera/scripts/install.sh
 sudo udevadm control --reload-rules && sudo udevadm trigger
 ```
 
-● Compiling
+## Quickstart
+
+In a first terminal:
 
 ```bash
- cd ~/ros2_ws
-source /opt/ros/galactic/setup.bash 
-colcon build --event-handlers  console_direct+  --cmake-args  -DCMAKE_BUILD_TYPE=Release
-```
+source install/setup.bash
 
-Starting the camera
-
-● In terminal 1
-
-```bash
-source /opt/ros/galactic/setup.bash 
-source ./install/setup.bash 
 ros2 launch astra_camera astra.launch.xml
 ```
 
-● In terminal 2
+In a second terminal:
 
 ```bash
-source /opt/ros/galactic/setup.bash 
-source ./install/setup.bash 
+source install/setup.bash
+
 rviz2
 ```
 
-● List topics / services/ parameters (open a new terminal)
+## Services
+
+### List topics / services/ parameters (open a new terminal)
 
 ```bash
-source /opt/ros/galactic/setup.bash 
+source /opt/ros/galactic/setup.bash
 ros2 topic list
-ros2 service list 
+ros2 service list
 ros2 param list
 ```
 
 Select the topic you want to display
 
-● Get camera parameters
+### Get camera parameters
 
 ```bash
 ros2 service call /camera/get_camera_info astra_camera_msgs/srv/GetCameraInfo '{}'
 ```
 
-● Check camera parameters, please refer to the ROS documentation for the meaning of the specific fields of the camera
-parameters  [camera info](http://docs.ros.org/en/melodic/api/sensor_msgs/html/msg/CameraInfo.html)
+### Check camera parameters
+
+Please refer to the ROS documentation for the meaning of the specific fields of the camera parameters  [camera info](http://docs.ros.org/en/melodic/api/sensor_msgs/html/msg/CameraInfo.html)
 
 ```bash
 ros2 topic echo /camera/depth/camera_info
 ros2 topic echo /camera/color/camera_info
 ```
 
-● Check device information
+### Check device information
 
 ```bash
 ros2 service call /camera/get_device_info astra_camera_msgs/srv/GetDeviceInfo '{}'
 ```
 
-● Get the SDK version
+### Get the SDK version
 
 ```bash
 ros2 service call /camera/get_sdk_version  astra_camera_msgs/srv/GetString "{}"
 ```
 
-● Set/get (auto) exposure
+### Set/get (auto) exposure
 
 ```bash
- # Auto exposure switch. For setting the exposure manually, please turn off the auto exposure first
- ros2 service call /camera/set_color_auto_exposure std_srvs/srv/SetBool '{data: false}' 
- ros2 service call /camera/set_uvc_auto_exposure std_srvs/srv/SetBool '{data: false}'
- ros2 service call /camera/set_ir_auto_exposure std_srvs/srv/SetBool "{data: false}"
-    
+# Auto exposure switch. For setting the exposure manually, please turn off the auto exposure first
+ros2 service call /camera/set_color_auto_exposure std_srvs/srv/SetBool '{data: false}'
+ros2 service call /camera/set_uvc_auto_exposure std_srvs/srv/SetBool '{data: false}'
+ros2 service call /camera/set_ir_auto_exposure std_srvs/srv/SetBool "{data: false}"
+
 # Setting exposure values
 ros2 service call /camera/set_ir_exposure astra_camera_msgs/srv/SetInt32 "{data: 2000}"
 ros2 service call /camera/set_color_exposure astra_camera_msgs/srv/SetInt32 "{data: 2000}"
 ros2 service call /camera/set_uvc_exposure astra_camera_msgs/srv/SetInt32 "{data: 2000}"
- # Get exposure
- ros2 service call /camera/get_ir_exposure astra_camera_msgs/srv/GetInt32 "{}"
- ros2 service call /camera/get_color_exposure astra_camera_msgs/srv/GetInt32 "{}"
- ros2 service call /camera/get_uvc_exposure astra_camera_msgs/srv/GetInt32 "{}"
+# Get exposure
+ros2 service call /camera/get_ir_exposure astra_camera_msgs/srv/GetInt32 "{}"
+ros2 service call /camera/get_color_exposure astra_camera_msgs/srv/GetInt32 "{}"
+ros2 service call /camera/get_uvc_exposure astra_camera_msgs/srv/GetInt32 "{}"
 ```
 
-● Set/get gain
+### Set/get gain
 
 ```bash
 # Get Gain
 ros2 service call /camera/get_color_gain astra_camera_msgs/srv/GetInt32 '{}' # OpenNI camera
 ros2 service call /camera/get_ir_gain astra_camera_msgs/srv/GetInt32 '{}' # OpenNI camera
 ros2 service call /camera/get_uvc_gain astra_camera_msgs/srv/GetInt32 "{}" # UVC camera
- # Setting the gain
+
+# Setting the gain
 ros2 service call /camera/set_color_gain astra_camera_msgs/srv/SetInt32 "{data: 200}"
 ros2 service call /camera/set_ir_gain astra_camera_msgs/srv/SetInt32 "{data: 200}"
 ros2 service call /camera/set_uvc_gain astra_camera_msgs/srv/SetInt32 "{data: 200}"
 ```
 
-● Set mirror mode
+### Set mirror mode
 
 ```bash
 ros2 service call /camera/set_color_mirror std_srvs/srv/SetBool '{data: true}'
@@ -153,35 +132,35 @@ ros2 service call /camera/set_depth_mirror std_srvs/srv/SetBool '{data: true}'
 ros2 service call /camera/set_uvc_color_mirror std_srvs/srv/SetBool '{data: true}'
 ```
 
-● Set/get (auto) white balance
+### Set/get (auto) white balance
 
 ```bash
 ros2 service call /camera/get_color_auto_white_balance astra_camera_msgs/srv/GetInt32 '{}' # Return 0 or 1
 ros2 service call /camera/set_color_auto_white_balance std_srvs/srv/SetBool '{data: false}'
 ```
 
-● Turn on/off laser
+### Turn on/off laser
 
 ```bash
 ros2 service call /camera/set_laser_enable std_srvs/srv/SetBool '{data: true}' # Turn on
 ros2 service call /camera/set_laser_enable std_srvs/srv/SetBool '{data: false}' #Turn off
 ```
 
-● Turn on/off fan
+### Turn on/off fan
 
 ```bash
- ros2 service call /camera/set_fan_mode std_srvs/srv/SetBool '{data: true}' #Turn on
- ros2 service call /camera/set_fan_mode std_srvs/srv/SetBool '{data: false}' # Turn off
+ros2 service call /camera/set_fan_mode std_srvs/srv/SetBool '{data: true}' #Turn on
+ros2 service call /camera/set_fan_mode std_srvs/srv/SetBool '{data: false}' # Turn off
 ```
 
-● Turn LDP on/off
+### Turn LDP on/off
 
 ```bash
 ros2 service call /camera/set_ldp_enable std_srvs/srv/SetBool '{data: true}'
 ros2 service call /camera/set_ldp_enable std_srvs/srv/SetBool '{data: false}'
 ```
 
-● Turn sensors on/off
+### Turn sensors on/off
 
 ```bash
 ros2 service call  /camera/toggle_ir std_srvs/srv/SetBool "{data: true}"
@@ -190,18 +169,17 @@ ros2 service call  /camera/toggle_depth std_srvs/srv/SetBool "{data: true}"
 ros2 service call /camera/toggle_uvc_camera std_srvs/srv/SetBool "{data : true}"
 ```
 
-### Multi-Camera
+## Multi-Camera
 
-● First, get the serial number of the camera, plug in the camera and run
+1. Get the serial number of the camera, plug in the camera and run
 
 ```bash
 ros2 run astra_camera list_devices_node
 ```
 
-● Set the parameter device_num to the number of cameras
+2. Set the parameter device_num to the number of cameras
 
-● Go to the `ros2_astra_camera/launch/multi_xxx.launch`   and change the serial number. Currently, different cameras can
-only be distinguished by the serial number,
+3. Go to the `ros2_astra_camera/launch/multi_xxx.launch` and change the serial number. Currently, different cameras can only be distinguished by the serial number.
 
 ```xml
 <launch>
@@ -238,7 +216,7 @@ causing the next start to be stuck.
 Before launch, please run
 
 ```bash
-ros2 run astra_camera cleanup_shm_node 
+ros2 run astra_camera cleanup_shm_node
 ```
 
 to clean up `/dev/shm/`.
@@ -332,11 +310,11 @@ projection_matrix:
 
 ## DDS Tuning
 
-The default DDS settings (Galactic) may not be efficient for data transmission. Different DDS settings will have
+The default DDS settings may not be efficient for data transmission. Different DDS settings will have
 different performance. Here we take CycloneDDS as an example. For detailed information, please refer
 to[ROS DDS Tuning](https://docs.ros.org/en/humble/How-To-Guides/DDS-tuning.html)。
 
-● Edit cyclonedds configuration file
+### Edit cyclonedds configuration file
 
 ```bash
 sudo gedit /etc/cyclonedds/config.xml
@@ -367,7 +345,7 @@ Add
 </CycloneDDS>
 ```
 
-● Set the environment variables, add to .zshrc or .bashrc
+Set the environment variables, add to .zshrc or .bashrc
 
 ```bash
 export ROS_DOMAIN_ID=42 # Numbers from 0 to 232
@@ -377,14 +355,14 @@ export CYCLONEDDS_URI=file:///etc/cyclonedds/config.xml
 
 Tip：to understand why the maximum ROS_DOMAIN_ID is 232, please
 visit [The ROS DOMAIN ID](https://docs.ros.org/en/humble/Concepts/About-Domain-ID.html)
-● Increase UDP receive buffer size
-Edit
+
+To increase UDP receive buffer size, edit
 
 ```bash
 /etc/sysctl.d/10-cyclone-max.conf
 ```
 
-Add
+as follows:
 
 ```bash
 net.core.rmem_max=2147483647
@@ -393,13 +371,13 @@ net.core.rmem_default=2147483647
 
 ## Frequently Asked Questions
 
-● No point cloud or image displayed on Rviz2
+### No point cloud or image displayed on Rviz2
 
 * The default QoS for outgoing messages is sense_data, i.e. Relaiblity Policy = Best Effort, please check if the
   Relaiblity Policy is set to Best Effort on Rviz2, and also check if there is any problem with the QoS setting of the
   message via `ros2 topic info -v /xxx/topic`
 
-● No picture from multiple cameras
+### No picture from multiple cameras
 
 * It is possible that the power supply is insufficient, do not connect all cameras to the same hub, and a powered hub is
   recommended
