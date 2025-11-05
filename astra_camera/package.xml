@@ -2,10 +2,12 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>astra_camera</name>
-  <version>1.1.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="jian.dong@pobox.com">Joe Dong</maintainer>
-  <license>TODO: License declaration</license>
+  <version>2.0.0</version>
+  <description>ROS2 driver for Astra RGBD camera</description>
+  <maintainer email="thibault.poignonec@gmail.com">tpoignonec</maintainer>
+  <license>Apache License 2.0</license>
+
+  <author email="mocun@orbbec.com">Joe Dong</author>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
