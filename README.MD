@@ -4,7 +4,8 @@ A ROS2 driver for Orbbec 3D cameras
 
 Current developments are based on the **jazzy** ROS2 distribution (Ubuntu 24.04 LTS).
 
-> [!note] This is a fork of [orbbec/ros2_astra_camera](https://github.com/orbbec/ros2_astra_camera).
+> [!NOTE]
+> This is a fork of [orbbec/ros2_astra_camera](https://github.com/orbbec/ros2_astra_camera).
 > Copyright 2023 Orbbec Ltd.
 
 ## Installation
@@ -41,6 +42,10 @@ In a first terminal:
 source install/setup.bash
 
 ros2 launch astra_camera astra.launch.xml
+
+# For Astra PRO models
+ros2 launch astra_camera astra_pro.launch.xml \
+  enable_colored_point_cloud:=true
 ```
 
 In a second terminal:
@@ -48,21 +53,15 @@ In a second terminal:
 ```bash
 source install/setup.bash
 
-rviz2
+# View color image
+sudo apt install ros-jazzy-image-pipeline
+ros2 run image_view image_view --ros-args --remap image:=/camera/color/image_raw
+
+# View laser image, depth image, and point cloud
+ros2 launch astra_camera display_images.launch.xml
 ```
 
 ## Services
-
-### List topics / services/ parameters (open a new terminal)
-
-```bash
-source /opt/ros/galactic/setup.bash
-ros2 topic list
-ros2 service list
-ros2 param list
-```
-
-Select the topic you want to display
 
 ### Get camera parameters
 
@@ -163,9 +162,9 @@ ros2 service call /camera/set_ldp_enable std_srvs/srv/SetBool '{data: false}'
 ### Turn sensors on/off
 
 ```bash
-ros2 service call  /camera/toggle_ir std_srvs/srv/SetBool "{data: true}"
-ros2 service call  /camera/toggle_color std_srvs/srv/SetBool "{data: true}"
-ros2 service call  /camera/toggle_depth std_srvs/srv/SetBool "{data: true}"
+ros2 service call /camera/toggle_ir std_srvs/srv/SetBool "{data: true}"
+ros2 service call /camera/toggle_color std_srvs/srv/SetBool "{data: true}"
+ros2 service call /camera/toggle_depth std_srvs/srv/SetBool "{data: true}"
 ros2 service call /camera/toggle_uvc_camera std_srvs/srv/SetBool "{data : true}"
 ```
 

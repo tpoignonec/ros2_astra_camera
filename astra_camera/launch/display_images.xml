@@ -1,0 +1,5 @@
+<launch>
+  <!-- Launch RViz2 with the config file from the config directory -->
+  <node pkg="rviz2" exec="rviz2" name="rviz2"
+        args="-d $(find-pkg-share astra_camera)/config/display_images.rviz"/>
+</launch>
